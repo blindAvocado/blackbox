@@ -18,6 +18,7 @@ model User {
   username          String            @unique @db.VarChar(32)
   email             String            @unique @db.VarChar(64)
   password_hash     String            @unique
+  refresh_hash      String?
   avatar_url        String            @db.VarChar(64)
   gender            Gender            @default(OTHER)
   settings          Json
@@ -37,6 +38,8 @@ model User {
   watched_shows     WatchedShow[]
   watched_episodes  WatchedEpisode[]
   actions           Action[]
+
+  @@map("users")
 }
 
 model Follows {
@@ -46,6 +49,7 @@ model Follows {
   followingId Int
 
   @@id([followerId, followingId])
+  @@map("follows")
 }
 
 model Show {
@@ -85,6 +89,8 @@ model Show {
   users_rating      ShowRating[]
   users_favorite    FavoriteShow[]
   users_watched_arr WatchedShow[]
+
+  @@map("shows")
 }
 
 model Season {
@@ -102,6 +108,8 @@ model Season {
   episodes       Episode[]
   list_items     ListItem[]
   users_favorite FavoriteSeason[]
+
+  @@map("seasons")
 }
 
 model Episode {
@@ -125,6 +133,8 @@ model Episode {
   users_rating        EpisodeRating[]
   users_favorite      FavoriteEpisode[]
   users_watched       WatchedEpisode[]
+
+  @@map("episodes")
 }
 
 model Comment {
@@ -135,6 +145,8 @@ model Comment {
   episode_id         Int
   body               String  @db.VarChar(2048)
   attached_image_url String  @db.VarChar(128)
+
+  @@map("comments")
 }
 
 model List {
@@ -147,6 +159,8 @@ model List {
   is_ranked Boolean    @default(false)
   items     ListItem[]
   tags      ListTag[]  @relation("ListTags")
+
+  @@map("lists")
 }
 
 model ListItem {
@@ -159,6 +173,8 @@ model ListItem {
   item_episode_id Int
   item_season     Season  @relation(fields: [item_season_id], references: [id])
   item_season_id  Int
+
+  @@map("list_items")
 }
 
 model ShowRating {
@@ -170,6 +186,7 @@ model ShowRating {
   createdAt DateTime @default(now())
 
   @@id([user_id, show_id])
+  @@map("show_ratings")
 }
 
 model EpisodeRating {
@@ -181,6 +198,7 @@ model EpisodeRating {
   createdAt  DateTime @default(now())
 
   @@id([user_id, episode_id])
+  @@map("episode_ratings")
 }
 
 model WatchedShow {
@@ -192,6 +210,7 @@ model WatchedShow {
   createdAt DateTime    @default(now())
 
   @@id([user_id, show_id])
+  @@map("watched_shows")
 }
 
 model WatchedEpisode {
@@ -202,6 +221,7 @@ model WatchedEpisode {
   createdAt  DateTime @default(now())
 
   @@id([user_id, episode_id])
+  @@map("watched_episodes")
 }
 
 model FavoriteShow {
@@ -211,6 +231,8 @@ model FavoriteShow {
   show      Show     @relation(fields: [show_id], references: [id])
   show_id   Int
   createdAt DateTime @default(now())
+
+  @@map("favorite_shows")
 }
 
 model FavoriteSeason {
@@ -220,6 +242,8 @@ model FavoriteSeason {
   season    Season   @relation(fields: [season_id], references: [id])
   season_id Int
   createdAt DateTime @default(now())
+
+  @@map("favorite_seasons")
 }
 
 model FavoriteEpisode {
@@ -229,6 +253,8 @@ model FavoriteEpisode {
   episode    Episode  @relation(fields: [episode_id], references: [id])
   episode_id Int
   createdAt  DateTime @default(now())
+
+  @@map("favorite_episodes")
 }
 
 model ShowTranslation {
@@ -239,6 +265,8 @@ model ShowTranslation {
   language_id Int
   title       String   @db.VarChar(128)
   summary     String?  @db.VarChar(512)
+
+  @@map("show_translations")
 }
 
 model EpisodeTranslation {
@@ -249,6 +277,8 @@ model EpisodeTranslation {
   language_id Int
   title       String   @db.VarChar(128)
   summary     String?  @db.VarChar(512)
+
+  @@map("episode_translations")
 }
 
 model Tag {
@@ -258,6 +288,8 @@ model Tag {
   user_id   Int
   lists     ListTag[] @relation("ListTags")
   createdAt DateTime  @default(now())
+
+  @@map("tags")
 }
 
 model ListTag {
@@ -267,12 +299,15 @@ model ListTag {
   tag     Tag  @relation("ListTags", fields: [tag_id], references: [id])
 
   @@id([list_id, tag_id])
+  @@map("list_tags")
 }
 
 model Genre {
   id    Int    @id @default(autoincrement())
   name  String @db.VarChar(32)
   shows Show[]
+
+  @@map("genres")
 }
 
 model Network {
@@ -281,6 +316,8 @@ model Network {
   country    Country @relation(fields: [country_id], references: [id])
   country_id Int
   shows      Show[]
+
+  @@map("networks")
 }
 
 model Country {
@@ -289,6 +326,8 @@ model Country {
   full_name String    @db.VarChar(64)
   shows     Show[]
   networks  Network[]
+
+  @@map("countries")
 }
 
 model Actor {
@@ -301,6 +340,8 @@ model Actor {
   deathdate   DateTime?
   updatedAt   DateTime  @updatedAt
   shows       Show[]
+
+  @@map("actors")
 }
 
 model Language {
@@ -310,6 +351,8 @@ model Language {
   shows               Show[]
   show_translation    ShowTranslation[]
   episode_translation EpisodeTranslation[]
+
+  @@map("languages")
 }
 
 model Permission {
@@ -319,6 +362,8 @@ model Permission {
   show_id      Int
 
   @@id([moderator_id, show_id])
+
+  @@map("permissions")
 }
 
 model Action {
@@ -328,6 +373,8 @@ model Action {
   action_type ActionType
   action_data Json
   createdAt   DateTime   @default(now())
+
+  @@map("actions")
 }
 
 enum ActionType {
